@@ -48,19 +48,25 @@ usage:
 	echo "";
 	echo "make target <options> <variable>=<value>";
 	echo "";
-	echo "To compile use:"
+	echo "To compile (compiles BOTH AXI and FIFO tests in one step):";
 	echo "make compile";
 	echo "";
-	echo "To simulate individual test:"
-	echo "make simulate test=<test_name> uvm_verbosity=<VERBOSITY_LEVEL>";
+	echo "To simulate a FIFO test:";
+	echo "make simulate test=<fifo_test_name> uvm_verbosity=<VERBOSITY_LEVEL>";
 	echo "";
-	echo "Example:":
-	echo "make simulate test=base_test uvm_verbosity=UVM_HIGH";
+	echo "Example:";
+	echo "make simulate test=fifo_bfm_32b_wr_incr_alligned_test_awlen_0 uvm_verbosity=UVM_MEDIUM";
 	echo "";
-	echo "To run regression:"
+	echo "To simulate an AXI test:";
+	echo "make simulate_axi test=<axi_test_name> uvm_verbosity=<VERBOSITY_LEVEL>";
+	echo "";
+	echo "Example:";
+	echo "make simulate_axi test=axi4_blocking_8b_write_read_test uvm_verbosity=UVM_MEDIUM";
+	echo "";
+	echo "To run regression:";
 	echo "make regression testlist_name=<regression_testlist_name.list>";
 	echo "";
-	echo "Example:":
+	echo "Example:";
 	echo "make regression testlist_name=axi4_transfers_regression.list";
 	echo "";
 	echo "-----------------------------------------------------------------";
@@ -74,20 +80,14 @@ all:
 #  +cover=becstf
 compile:
 	make clean_compile;
-	#make clean_simulate;
-	vlib work; 
+	vlib work;
 	vlog -sv \
 	+acc \
 	+cover \
 	+fcover \
-	-l axi4_fifo_bfm_compile.log \
-	-f ../axi4_fifo.f
+	-l axi4_all_compile.log \
+	-f ../axi4_all.f
 
-	# -s means silent mode
-	#  The command executed along with the output will be displayed on the terminal
-	#  To get only the ouput use 'silent' mode
-	# make compile_war_err -s
-	# or use .SILENT
 	make compile_war_err
 
 # Setting a default test as base_test
@@ -151,6 +151,27 @@ simulate:
 	#
 	# To open the wavefrom with saved signals
 	# vsim -view waveform.wlf -do axi4_waves.do &
+
+simulate_axi:
+	mkdir $(test_folder)
+
+	vsim -vopt \
+	work.hdl_top work.hvl_top \
+	-voptargs=+acc=npr \
+	-assertdebug \
+	+UVM_TESTNAME=$(test) \
+	+UVM_VERBOSITY=$(uvm_verbosity) \
+	-l $(test_folder)/$(test).log \
+	-sva \
+	-coverage \
+	-permit_unmatched_virtual_intf \
+	-c -do "log -r /*; add wave -r /*; coverage save -onexit -assert -directive -cvg -codeAll $(test_folder)/$(test)_coverage.ucdb; run -all; exit" \
+	-wlf $(test_folder)/waveform.wlf
+
+	make simulate_war_err
+	make merge_cov_report
+
+	vcover report -html $(test_folder)/$(test)_coverage.ucdb -htmldir $(test_folder)/html_cov_report -details
 
 clean_simulate:
 	rm -rf *_test*
