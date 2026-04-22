@@ -36,7 +36,8 @@ class write_fifo_driver extends uvm_driver#(write_fifo_seq_item);
 
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-    uvm_config_db#(virtual fifo_if)::get(this,"","vif",fintf);
+    if(!uvm_config_db#(virtual fifo_if)::get(this,"","vif",fintf))
+      `uvm_fatal(get_type_name(),"Failed to get virtual fifo_if from config_db")
   endfunction
 
   task wait_for_reset();

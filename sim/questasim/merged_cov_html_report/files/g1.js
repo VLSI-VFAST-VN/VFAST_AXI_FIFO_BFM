@@ -1,2 +1,0 @@
-var g_data = {"44":{"pr":"/axi4_slave_pkg","ty":2,"dui":6,"dun":"work.axi4_slave_pkg","cvgs":[{"h":["\\/axi4_slave_pkg::axi4_slave_coverage::axi4_slave_covergroup ",2,1,71,45],"cov":[646,75,38.20],"opts":{"goal":"100","per_instance":"true"}},{"h":["/axi4_slave_pkg/axi4_slave_coverage/axi4_slave_covergroup",1,1,45],"cov":[646,75,38.20],"opts":{"goal":"100","merge_instance":"auto(true)"}}]}};
-processCovergroupsData(g_data);

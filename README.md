@@ -25,4 +25,13 @@ AXI_FIFO_BFM/src/axi_fifo_bfm/test/test/
 // Sequences path:
 AXI_FIFO_BFM/src/axi_fifo_bfm/test/sequence/
 
+make compile_axi
+make simulate_axi test=axi4_blocking_8b_write_read_test uvm_verbosity=UVM_MEDIUM
+
+
+make compile
+make simulate test=fifo_bfm_32b_wr_incr_alligned_test_awlen_0
+
+make regression testlist_name=axi4_transfers_regression.list
+make regression testlist_name=fifo_all_regression.list
 
